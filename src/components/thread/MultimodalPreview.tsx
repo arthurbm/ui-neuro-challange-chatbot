@@ -52,6 +52,53 @@ export const MultimodalPreview: React.FC<MultimodalPreviewProps> = ({
     );
   }
 
+  // URL-based image block
+  if (
+    block.type === "image" &&
+    block.source_type === "url" &&
+    typeof block.url === "string"
+  ) {
+    // Para gráficos/charts, usar dimensões maiores
+    let width: number, height: number, imgClass: string;
+
+    if (size === "sm") {
+      width = 200;
+      height = 150;
+      imgClass = "rounded-md w-full h-auto";
+    } else if (size === "md") {
+      width = 400;
+      height = 300;
+      imgClass = "rounded-md w-full h-auto";
+    } else {
+      // lg - 100% da largura disponível para gráficos
+      width = 1000;
+      height = 600;
+      imgClass = "rounded-md w-full h-auto";
+    }
+
+    return (
+      <div className={cn("relative w-full", className)}>
+        <Image
+          src={block.url}
+          alt={String(block.metadata?.name || "generated chart")}
+          className={imgClass}
+          width={width}
+          height={height}
+        />
+        {removable && (
+          <button
+            type="button"
+            className="absolute top-1 right-1 z-10 rounded-full bg-gray-500 text-white hover:bg-gray-700"
+            onClick={onRemove}
+            aria-label="Remove image"
+          >
+            <XIcon className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+    );
+  }
+
   // PDF block
   if (
     block.type === "file" &&

@@ -85,5 +85,15 @@ export function isBase64ContentBlock(
   ) {
     return true;
   }
+  // URL-based image (new)
+  if (
+    (block as { type: unknown }).type === "image" &&
+    "source_type" in block &&
+    (block as { source_type: unknown }).source_type === "url" &&
+    "url" in block &&
+    typeof (block as { url?: unknown }).url === "string"
+  ) {
+    return true;
+  }
   return false;
 }

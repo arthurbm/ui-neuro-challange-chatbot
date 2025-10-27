@@ -2,6 +2,8 @@ import { AIMessage, ToolMessage } from "@langchain/langgraph-sdk";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { MultimodalPreview } from "@/components/thread/MultimodalPreview";
+import { isBase64ContentBlock } from "@/lib/multimodal-utils";
 
 function isComplexValue(value: any): boolean {
   return Array.isArray(value) || (typeof value === "object" && value !== null);
@@ -67,6 +69,73 @@ export function ToolCalls({
 
 export function ToolResult({ message }: { message: ToolMessage }) {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Verificar se content é array de content blocks
+  const isContentBlocksArray = Array.isArray(message.content) &&
+    message.content.length > 0 &&
+    typeof message.content[0] === "object" &&
+    "type" in message.content[0];
+
+  // Se for array de content blocks, renderizar separadamente
+  if (isContentBlocksArray) {
+    const textBlocks = message.content.filter((b: any) => b.type === "text");
+    const imageBlocks = message.content.filter((b: any) =>
+      (b.type === "image" && (b.source_type === "base64" || b.source_type === "url")) ||
+      isBase64ContentBlock(b)
+    );
+
+    return (
+      <div className="mx-auto grid max-w-3xl grid-rows-[1fr_auto] gap-2">
+        <div className="overflow-hidden rounded-lg border border-gray-200">
+          {/* Header */}
+          <div className="border-b border-gray-200 bg-gray-50 px-4 py-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              {message.name ? (
+                <h3 className="font-medium text-gray-900">
+                  Tool Result:{" "}
+                  <code className="rounded bg-gray-100 px-2 py-1">
+                    {message.name}
+                  </code>
+                </h3>
+              ) : (
+                <h3 className="font-medium text-gray-900">Tool Result</h3>
+              )}
+              {message.tool_call_id && (
+                <code className="ml-2 rounded bg-gray-100 px-2 py-1 text-sm">
+                  {message.tool_call_id}
+                </code>
+              )}
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-3 bg-gray-100">
+            {/* Render text blocks */}
+            {textBlocks.length > 0 && (
+              <div className="mb-2">
+                {textBlocks.map((block: any, idx: number) => (
+                  <p key={idx} className="text-sm text-gray-700">{block.text}</p>
+                ))}
+              </div>
+            )}
+
+            {/* Render image blocks */}
+            {imageBlocks.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {imageBlocks.map((block: any, idx: number) => (
+                  <MultimodalPreview
+                    key={idx}
+                    block={block}
+                    size="lg"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   let parsedContent: any;
   let isJsonContent = false;
