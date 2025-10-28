@@ -77,7 +77,7 @@ export function ToolResult({ message }: { message: ToolMessage }) {
     "type" in message.content[0];
 
   // Se for array de content blocks, renderizar separadamente
-  if (isContentBlocksArray) {
+  if (isContentBlocksArray && Array.isArray(message.content)) {
     const textBlocks = message.content.filter((b: any) => b.type === "text");
     const imageBlocks = message.content.filter((b: any) =>
       (b.type === "image" && (b.source_type === "base64" || b.source_type === "url")) ||

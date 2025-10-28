@@ -3,8 +3,19 @@ import { File, Image as ImageIcon, X as XIcon } from "lucide-react";
 import type { Base64ContentBlock } from "@langchain/core/messages";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+
+// Extended type to support URL-based images
+type URLContentBlock = {
+  type: "image";
+  source_type: "url";
+  url: string;
+  metadata?: Record<string, unknown>;
+};
+
+type ContentBlock = Base64ContentBlock | URLContentBlock;
+
 export interface MultimodalPreviewProps {
-  block: Base64ContentBlock;
+  block: ContentBlock;
   removable?: boolean;
   onRemove?: () => void;
   className?: string;
