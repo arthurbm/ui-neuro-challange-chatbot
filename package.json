@@ -1,7 +1,7 @@
 {
   "name": "neuro-chat-ui",
   "readme": "https://github.com/langchain-ai/neuro-chat-ui/blob/main/README.md",
-  "homepage": "https://agentchat.vercel.app",
+  "homepage": "https://neurocredito.vercel.app",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/langchain-ai/neuro-chat-ui.git"
